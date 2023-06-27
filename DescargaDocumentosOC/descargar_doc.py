@@ -2,13 +2,29 @@ import win32com.client as win32
 import pythoncom
 import win32com.client
 import os, shutil, time
-
+from datetime import datetime
 
 def me23n(sesionsap, oc):
 
      """DESCARGAR ADJUNTOS POR CADA OC """
      
-     ruta_destino = f"U:/Aplicaciones_procesos/COMPRAS/descarga_adj_oc/{oc}"
+     
+     # Defino parametros de Fecha
+     ahora=datetime.now()
+     dia = ahora.day
+     mes = ahora.month
+     year = ahora.year
+     if mes < 10: mes = f"0{mes}"
+     if dia < 10: dia = f"0{dia}"
+     fh_corrida = str(year)+"."+str(mes)+"."+str(dia)
+     ruta_inicial = f"U:/Aplicaciones_procesos/COMPRAS/descarga_adj_oc/{fh_corrida}"
+     try: 
+          os.mkdir(ruta_inicial)
+     except FileExistsError: 
+          pass
+
+     # Defino parametros de rutas
+     ruta_destino = f"U:/Aplicaciones_procesos/COMPRAS/descarga_adj_oc/{fh_corrida}/{oc}"
      
      flag = True
      if flag:     
@@ -40,25 +56,34 @@ def me23n(sesionsap, oc):
           session.findById("wnd[1]").sendVKey(0)
           session.findById("wnd[0]/titl/shellcont/shell").pressButton("%GOS_TOOLBOX")
           session.findById("wnd[0]/shellcont/shell").pressButton("VIEW_ATTA")
+          
           try: 
                os.mkdir(ruta_destino)
           except FileExistsError: 
-               print(f'Ya existe la carpeta para la oc {oc}')
+               print(f'Ya existe la carpeta para la oc {oc} para la fecha {fh_corrida}')
                return True
-          for i in range (0,50): 
+          for i in range (0,20): 
                try:
                     session.findById("wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell").selectedRows = f"{i}" 
                     session.findById("wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell").pressToolbarButton("%ATTA_EXPORT")
-                    time.sleep(0.2)
                     session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_destino
-                    session.findById("wnd[1]/usr/ctxtDY_PATH").setFocus
+                    session.findById("wnd[1]/usr/ctxtDY_PATH").setFocus()
                     session.findById("wnd[1]/usr/ctxtDY_PATH").caretPosition = 32
                     session.findById("wnd[1]").sendVKey (0)
-                    time.sleep(0.2)
                except: 
-                    # Esta parte es por adjunto duplicado, intento darle al boton cerrar 
-                    try: session.findById("wnd[1]/tbar[0]/btn[12]").press()
-                    except: pass
+                    try:
+                         i+= 1
+                         session.findById("wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell").selectedRows = f"{i}" 
+                         session.findById("wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell").pressToolbarButton("%ATTA_EXPORT")
+                         session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_destino
+                         session.findById("wnd[1]/usr/ctxtDY_PATH").setFocus()
+                         session.findById("wnd[1]/usr/ctxtDY_PATH").caretPosition = 32
+                         session.findById("wnd[1]").sendVKey (0)
+                    except:
+                         # Esta parte es por adjunto duplicado, intento darle al boton cerrar 
+                         try: session.findById("wnd[1]/tbar[0]/btn[12]").press()
+                         except: pass
+
                     break
 
           try: session.findById("wnd[1]/tbar[0]/btn[0]").press()
