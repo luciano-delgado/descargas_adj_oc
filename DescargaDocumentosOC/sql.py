@@ -31,9 +31,6 @@ class Hana():
         FROM EKBE 
         WHERE 
             XBLNR IN ('{factura}') 
-            -- ('00003A00000386') -- #MAS DE UNA OC?
-            -- XBLNR IN('00011A00109524')
-            -- XBLNR IN('00003A00000254')
     """
         self.__cursor.execute(self.q)
         df = pd.read_sql_query(self.q,self.__connection)
