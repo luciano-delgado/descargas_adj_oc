@@ -4,7 +4,7 @@ import win32com.client
 import os, shutil, time
 from datetime import datetime
 
-def me23n(sesionsap, oc):
+def me23n(sesionsap, oc, fc):
 
      """DESCARGAR ADJUNTOS POR CADA OC """
      
@@ -24,7 +24,7 @@ def me23n(sesionsap, oc):
           pass
 
      # Defino parametros de rutas
-     ruta_destino = f"U:/Aplicaciones_procesos/COMPRAS/descarga_adj_oc/{fh_corrida}/{oc}"
+     ruta_destino = f"U:/Aplicaciones_procesos/COMPRAS/descarga_adj_oc/{fh_corrida}/{oc}-{fc}"
      
      flag = True
      if flag:     
